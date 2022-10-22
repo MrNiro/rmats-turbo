@@ -33,7 +33,8 @@ def doSTARMapping(fastq):
     base_path = "/data/bioinformatics/projects/biohub/marco2022/"
     print("STAR Mapping...")
     for i, each in enumerate(fastq):
-        map_folder = base_path + "STAR_Results/" + each.split("/")[-1]
+        prefix = each.split("/")[-1].split(".")[0]
+        map_folder = base_path + "STAR_Results/" + prefix
         if os.path.exists(map_folder):
             if os.path.isdir(map_folder):
                 os.rmdir(map_folder)
@@ -50,11 +51,11 @@ def doSTARMapping(fastq):
         cmd += ' --outFileNamePrefix ' + map_folder + '/ --readFilesIn '
         # if not allow_clipping:
         #     cmd += ' --alignEndsType EndToEnd'
-        cmd += ' '.join(each)
+        cmd += each
         if each.endswith('.gz'):
             cmd += ' --readFilesCommand zcat'
 
-        print("mapping sample %d / %d, STAR Command: %s" % (i, len(fastq), cmd))
+        print("mapping sample %d / %d, STAR Command: \n\t%s" % (i + 1, len(fastq), cmd))
         status, output = getstatusoutput(cmd)
         print("mapping %s is done with status %s" % (each, status))
 
