@@ -9,7 +9,7 @@ ifndef FC
 FC := gfortran
 endif
 
-LDFLAGS := -lm -lgfortran -lgsl -lgslcblas -lgomp -lblas -llapack
+LDFLAGS := -lm -lgfortran -lgsl -lgslcblas -lgomp -lblas -llapack -L/usr/lib/gcc/x86_64-redhat-linux/3.4.6/ -lg2c
 CFLAGS := -Wall -O2 -msse2 -funroll-loops -fopenmp
 
 # Allow gsl flags to be set by environment variable

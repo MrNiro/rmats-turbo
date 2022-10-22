@@ -61,3 +61,8 @@ s2.txt
 
 # tests
 /tests/test_config.py
+
+/tmp
+/result*
+core.*
+log*
