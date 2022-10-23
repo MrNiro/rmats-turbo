@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-nThreads = 8
+nThreads = 6
 topHatAnchor = 6
 StarIndex = "/data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Sequence/starIndex.v2.7.3"
 gtf = "/data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes.gtf"
@@ -35,14 +35,15 @@ def doSTARMapping(fastq):
     for i, each in enumerate(fastq):
         prefix = each.split("/")[-1].split(".")[0]
         map_folder = base_path + "STAR_Results/" + prefix
-        if os.path.exists(map_folder):
-            if os.path.isdir(map_folder):
-                os.rmdir(map_folder)
-            else:
-                os.unlink(map_folder)
-        os.makedirs(map_folder)
+        if not os.path.exists(map_folder):
+            # if os.path.isdir(map_folder):
+            #     os.rmdir(map_folder)
+            # else:
+            #     os.unlink(map_folder)
+            os.makedirs(map_folder)
 
-        cmd = 'STAR --chimSegmentMin 2 --outFilterMismatchNmax 3'
+        cmd = 'STAR --twopassMode Basic '
+        cmd += ' --chimSegmentMin 2 --outFilterMismatchNmax 3'
         cmd += ' --runThreadN ' + str(max([4, nThreads]))
         cmd += ' --outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate '
         cmd += '--alignSJDBoverhangMin ' + str(topHatAnchor)
@@ -60,7 +61,8 @@ def doSTARMapping(fastq):
         print("mapping %s is done with status %s" % (each, status))
 
         if int(status) != 0:
-            print("\n*********** error in mapping sample_%d, %s: %s *************" % (i, each, status))
+            print("\n*********** error in mapping sample_%d, %s *************" % (i, each))
+            print("exit status: ", status)
             print("error detail: \n%s\n" % output)
             # raise Exception()
         else:
@@ -74,8 +76,8 @@ if __name__ == '__main__':
     raw_data_path = "/data/bioinformatics/projects/biohub/marco2022/raw/"
     s1_path = raw_data_path + "s1.txt"
     s2_path = raw_data_path + "s2.txt"
-    s1 = open(s1_path).readline().split(",")
-    s2 = open(s2_path).readline().split(",")
+    s1 = open(s1_path).readline().strip().split(",")
+    s2 = open(s2_path).readline().strip().split(",")
     Fastq = s1 + s2
 
     doSTARMapping(Fastq)
