@@ -9,6 +9,8 @@
 from __future__ import print_function
 
 import sys
+sys.path.append("/data/bioinformatics/projects/biohub/marco2022/src/rmats-turbo")
+
 import os
 import os.path
 import argparse

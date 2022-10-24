@@ -14,11 +14,11 @@ asevent_ext = [
               libraries=['m','stdc++','bamtools','z'],
               library_dirs=bamtools_lib,
               extra_compile_args = ['-O3', '-funroll-loops',
-                                    '-std=c++11', '-fopenmp',
+                                    '-std=c++0x', '-fopenmp',
                                     '-D__STDC_CONSTANT_MACROS',
                                     '-D__STDC_LIMIT_MACROS', '-w',
                                     '-Wl,-static',],
-              extra_link_args=['-lbamtools', '-lm', '-std=c++11',
+              extra_link_args=['-lbamtools', '-lm', '-std=c++0x',
                                '-lz', '-fopenmp',],
               language="c++",
               )

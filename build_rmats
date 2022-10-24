@@ -86,7 +86,7 @@ function main() {
   source "${SCRIPT_DIR}/setup_environment.sh" || return 1
 
   if [[ "${USE_CONDA}" -eq 1 ]]; then
-    create_and_activate_conda_env || return 1
+    # create_and_activate_conda_env || return 1
     install_conda_dependencies || return 1
   fi
 
@@ -96,9 +96,9 @@ function main() {
     install_pairadise || return 1
   fi
 
-  if [[ "${USE_CONDA}" -eq 1 ]]; then
-    conda deactivate || return 1
-  fi
+  # if [[ "${USE_CONDA}" -eq 1 ]]; then
+  #  conda deactivate || return 1
+  # fi
 }
 
 main "$@"
