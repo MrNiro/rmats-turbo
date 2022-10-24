@@ -33,8 +33,9 @@ def doSTARMapping(fastq):
     base_path = "/data/bioinformatics/projects/biohub/marco2022/"
     print("STAR Mapping...")
     for i, each in enumerate(fastq):
-        prefix = each.split("/")[-1].split(".")[0]
-        map_folder = base_path + "star_results_IFN/" + prefix
+        r1, r2 = each.split(":")
+        prefix = r1.split("/")[-1].split(".")[0][:-2]
+        map_folder = base_path + "new_star_results/" + prefix
         if not os.path.exists(map_folder):
             # if os.path.isdir(map_folder):
             #     os.rmdir(map_folder)
@@ -52,7 +53,7 @@ def doSTARMapping(fastq):
         cmd += ' --outFileNamePrefix ' + map_folder + '/ --readFilesIn '
         # if not allow_clipping:
         #     cmd += ' --alignEndsType EndToEnd'
-        cmd += each
+        cmd += (r1 + " " + r2)
         if each.endswith('.gz'):
             cmd += ' --readFilesCommand zcat'
 
@@ -69,8 +70,8 @@ def doSTARMapping(fastq):
             print(output)
         bams.append(os.path.join(map_folder, 'Aligned.sortedByCoord.out.bam'))
 
-    b1 = open(base_path + "input/b1_IFN.txt", "w")
-    b2 = open(base_path + "input/b2_IFN.txt", "w")
+    b1 = open(base_path + "input/b1.txt", "w")
+    b2 = open(base_path + "input/b2.txt", "w")
     for i, b in enumerate(bams):
         if i < 6:
             b1.write(b)
