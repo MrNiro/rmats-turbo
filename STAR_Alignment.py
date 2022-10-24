@@ -34,7 +34,7 @@ def doSTARMapping(fastq):
     print("STAR Mapping...")
     for i, each in enumerate(fastq):
         prefix = each.split("/")[-1].split(".")[0]
-        map_folder = base_path + "star_results/" + prefix
+        map_folder = base_path + "star_results_IFN/" + prefix
         if not os.path.exists(map_folder):
             # if os.path.isdir(map_folder):
             #     os.rmdir(map_folder)
@@ -69,13 +69,26 @@ def doSTARMapping(fastq):
             print(output)
         bams.append(os.path.join(map_folder, 'Aligned.sortedByCoord.out.bam'))
 
-    print(bams)
+    b1 = open(base_path + "input/b1_IFN.txt", "w")
+    b2 = open(base_path + "input/b2_IFN.txt", "w")
+    for i, b in enumerate(bams):
+        if i < 6:
+            b1.write(b)
+            if i != 5:
+                b1.write(",")
+        else:
+            b2.write(b)
+            if i != 11:
+                b1.write(",")
+        print(b)
+    b1.close()
+    b2.close()
 
 
 if __name__ == '__main__':
     raw_data_path = "/data/bioinformatics/projects/biohub/marco2022/raw/"
-    s1_path = raw_data_path + "s1.txt"
-    s2_path = raw_data_path + "s2.txt"
+    s1_path = raw_data_path + "s1_IFN.txt"
+    s2_path = raw_data_path + "s2_IFN.txt"
     s1 = open(s1_path).readline().strip().split(",")
     s2 = open(s2_path).readline().strip().split(",")
     Fastq = s1 + s2
