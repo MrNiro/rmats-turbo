@@ -34,7 +34,7 @@ def doSTARMapping(fastq):
     print("STAR Mapping...")
     for i, each in enumerate(fastq):
         prefix = each.split("/")[-1].split(".")[0]
-        map_folder = base_path + "STAR_Results/" + prefix
+        map_folder = base_path + "star_results/" + prefix
         if not os.path.exists(map_folder):
             # if os.path.isdir(map_folder):
             #     os.rmdir(map_folder)
