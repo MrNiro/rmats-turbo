@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 
 
@@ -72,24 +73,29 @@ def doSTARMapping(fastq):
 
     b1 = open(base_path + "input/b1.txt", "w")
     b2 = open(base_path + "input/b2.txt", "w")
+    split_pos = int(len(fastq) / 2)
     for i, b in enumerate(bams):
-        if i < 6:
+        if i < split_pos:
             b1.write(b)
-            if i != 5:
+            if i != split_pos - 1:
                 b1.write(",")
         else:
             b2.write(b)
-            if i != 11:
-                b1.write(",")
+            if i != len(fastq) - 1:
+                b2.write(",")
         print(b)
     b1.close()
     b2.close()
 
 
 if __name__ == '__main__':
-    raw_data_path = "/data/bioinformatics/projects/biohub/marco2022/raw/"
-    s1_path = raw_data_path + "s1_IFN.txt"
-    s2_path = raw_data_path + "s2_IFN.txt"
+    raw_data_path = "/data/bioinformatics/projects/biohub/marco2022/input/"
+    if len(sys.argv) == 3:
+        s1_path = raw_data_path + sys.argv[1]
+        s2_path = raw_data_path + sys.argv[2]
+    else:
+        s1_path = raw_data_path + "s1.txt"
+        s2_path = raw_data_path + "s2.txt"
     s1 = open(s1_path).readline().strip().split(",")
     s2 = open(s2_path).readline().strip().split(",")
     Fastq = s1 + s2
