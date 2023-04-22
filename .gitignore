@@ -67,3 +67,6 @@ s2.txt
 /result*
 core.*
 log*
+
+*.Rproj
+*.Rhistory
