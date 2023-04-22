@@ -1,3 +1,92 @@
+# Working Notes for rMATs on ErisOne
+
+## Problems
+- pathway enrichment的结果很少，有的event甚至没有任何结果
+	- Gene Universe设置问题？
+	- p_value选择问题？
+	- enrichment方式问题？
+		- 目前只使用了GO进行enrichment
+	- 需不需要先跑一次普通的DEA+pathway，再进行结果对比
+
+## ErisOne Working Dir: 
+- /data/bioinformatics/projects/biohub/marco2022/
+- Path to GTF Annotation & STARIndex
+	- /data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes.gtf
+	- /data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Sequence/starIndex
+
+## To execute analysis on ErisOne
+```bash
+# use -q big-multi if more than 6 processors are requested
+bsub -q big -M 20000 -R 'rusage[mem=20000]' -n 6 \ 
+-oo /data/bioinformatics/projects/biohub/marco2022/2pass-log-1023 \ 
+-eo /data/bioinformatics/projects/biohub/marco2022/2pass-log-1023 \ 
+-u qlin3@bwh.harvard.edu -N \ 
+bash sub_star.sh
+
+bsub -q big -M 20000 -R 'rusage[mem=20000]' -n 6 -oo /data/bioinformatics/projects/biohub/marco2022/2pass-log-1023 -eo /data/bioinformatics/projects/biohub/marco2022/2pass-log-1023 -u qlin3@bwh.harvard.edu -N bash sub_star.sh
+```
+
+## Change Log & Problem Solving:
+- in "./build_rmats.sh"
+	- "activate / deactivate" not work in the script
+	- removed them from script
+	- create and activate by myself
+- in "./bamtools/CMakeLists.txt", line 43
+	- unrocognized "-std=c++03"
+	- changed to "-std=c++98" works
+- ```lbfgsb.f:(.text+0x54c): undefined reference to `s_cmp' ...```
+	- Modify "./rMATS_C/Makefile", line 12
+		- LDFLAGS = ... -L{path/to/libg2c.so/lib} -lg2c
+- in "./rMATS_pipeline/setup.py"
+	- unrocognized "-std=c++11" 
+	- Even when I am using gcc11
+	- changed to "-std=c++0x" works
+
+- Run time Error: "error while loading shared libraries: libgsl.so.25"
+	- Solution
+		```bash
+		# find where is libgsl.so
+		find ~/ -name "libgsl.so.25"
+
+		# check if there is LD_LIBRARY_PATH env already
+		echo $LD_LIBRARY_PATH
+		export LD_LIBRARY_PATH={output-of-find}
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{output-of-find}
+		```
+
+## Useful Command:
+- compute nodes - Interactive mode
+	```bash
+	# could pending long if large resources are requested
+	bsub -Is -R 'rusage[mem=10000]' -n 4 /bin/bash
+	```
+
+- download aws gtf annotation
+	```
+	aws s3 sync --no-sign-request s3://ngi-igenomes/igenomes/Homo_sapiens/NCBI/GRCh38/Annotation/Genes/ ./
+	```
+
+- setup env with conda
+	```bash
+	conda create rmats
+	./build_rmats --conda
+	```
+- to run with fastq file
+	- STAR Index must be provided
+	```bash
+	./run_rmats --s1 /data/bioinformatics/projects/biohub/marco2022/raw/s1.txt --s2 /data/bioinformatics/projects/biohub/marco2022/raw/s2.txt --bi /data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Sequence/starIndex.v2.7.3 --gtf /data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes.gtf -t paired --readLength 50 --nthread 4 --od /data/bioinformatics/projects/biohub/marco2022/results --tmp ./tmp
+
+	python rmats.py --s1 ../rMatsData/s1.txt --s2 ../rMatsData/s2.txt --bi path/to/STARIndex --gtf /mnt/d/Coding/HarvardMedicalSchool/genomes/	gtf/genes.gtf -t paired --readLength 50 --nthread 6 --od ./results --tmp ./tmp
+	```
+
+- to run with bam file
+	```bash
+	python rmats.py --b1 ../rMatsData/b1.txt --b2 ../rMatsData/b2.txt --gtf /mnt/d/Coding/HarvardMedicalSchool/genomes/gtf/genes.gtf -t paired --readLength 50 --nthread 6 --od ./results --tmp ./tmp
+
+	./run_rmats --b1 /data/bioinformatics/projects/biohub/marco2022/input/b1.txt --b2 /data/bioinformatics/projects/biohub/marco2022/input/b2.txt --gtf /data/bioinformatics/referenceGenome/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes.gtf -t paired --readLength 284 --variable-read-length --allow-clipping --nthread 4 --od /data/bioinformatics/projects/biohub/marco2022/results-1026 --tmp ./tmp-1026
+	```
+
+
 # rMATS turbo v4.1.2
 
 [![Latest Release](https://img.shields.io/github/release/Xinglab/rmats-turbo.svg?label=Latest%20Release)](https://github.com/Xinglab/rmats-turbo/releases/latest)
